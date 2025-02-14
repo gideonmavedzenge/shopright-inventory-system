@@ -2,13 +2,13 @@
     {
         "id": 1,
         "name": "Product A",
-        "stock": 8,
+        "stock": 10,
         "price": 20.99
     },
     {
         "id": 2,
         "name": "Product B",
-        "stock": 4,
+        "stock": 10,
         "price": 14.99
     }
 ]

@@ -21,9 +21,34 @@ class OrderProcessor {
         if ($quantity <= 0) {
             return "Invalid order quantity.";
         }
+
+        // Retrieve current inventory from the cache.
+        $inventory = $this->inventoryManager->getInventory();
+        $productFound = false;
+        foreach ($inventory as $product) {
+            if ($product['id'] === $productId) {
+                $productFound = true;
+                if ($product['stock'] < $quantity) {
+                    $this->logService->logError(
+                        "Not enough stock for product: " . $product['name'] . 
+                        " (ID: " . $product['id'] . "). Requested: $quantity, Available: " . $product['stock']
+                    );
+                    return "Error: Not enough stock.";
+                }
+                break;
+            }
+        }
+
+        if (!$productFound) {
+            $this->logService->logError("Product not found: Product ID: $productId.");
+            return "Error: Product not found.";
+        }
+
+        // Update product stock.
         $updatedProduct = $this->inventoryManager->updateProductStock($productId, $quantity);
         if ($updatedProduct === null) {
-            return "Error: Not enough stock or product not found.";
+            $this->logService->logError("Failed to update product stock for product ID: $productId.");
+            return "Error: Could not update product stock.";
         }
 
         // Log the order.

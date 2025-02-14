@@ -1,1 +1,6 @@
-[]
+[
+    {
+        "message": "Not enough stock for product: Product A (ID: 1). Requested: 10, Available: 1",
+        "timestamp": 1739538717
+    }
+]

@@ -21,6 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $quantity  = (int) ($_POST['quantity'] ?? 0);
     $message = $orderProcessor->processOrder($productId, $quantity);
 }
+
+$inventory = $inventoryManager->getInventory();
 ?>
 <!DOCTYPE html>
 <html>
@@ -28,75 +30,112 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <title>ShopRight Inventory Management</title>
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
     body {
-        font-family: Arial, sans-serif;
-        margin: 20px;
+        margin-top: 20px;
     }
 
     .notification {
-        background: #f8d7da;
-        padding: 10px;
-        margin: 10px 0;
-        border: 1px solid #f5c6cb;
-    }
-
-    .order-log {
-        background: #d4edda;
-        padding: 10px;
-        margin: 10px 0;
-        border: 1px solid #c3e6cb;
+        margin-bottom: 10px;
     }
     </style>
 </head>
 
 <body>
-    <h1>ShopRight Inventory Management</h1>
-    <?php if($message): ?>
-    <p><?php echo htmlspecialchars($message); ?></p>
-    <?php endif; ?>
+    <div class="container">
+        <h1 class="mb-4">ShopRight Inventory Management</h1>
 
-    <h2>Place an Order</h2>
-    <form method="post" action="">
-        <label for="product_id">Product ID:</label>
-        <input type="number" name="product_id" required>
-        <br><br>
-        <label for="quantity">Quantity:</label>
-        <input type="number" name="quantity" required>
-        <br><br>
-        <button type="submit">Process Order</button>
-    </form>
+        <?php if($message): ?>
+        <div id="alert-message" class="alert alert-info"><?php echo htmlspecialchars($message); ?></div>
+        <?php endif; ?>
 
-    <h2>Low Stock Notifications</h2>
-    <?php
-    if (isset($_SESSION['notifications']) && count($_SESSION['notifications']) > 0) {
-        foreach ($_SESSION['notifications'] as $note) {
-            echo '<div class="notification">' . htmlspecialchars($note) . '</div>';
-        }
-    } else {
-        echo '<p>No notifications.</p>';
-    }
-    ?>
+        <div class="card mb-4">
+            <div class="card-header">Place an Order</div>
+            <div class="card-body">
+                <form method="post" action="">
+                    <div class="mb-3">
+                        <label for="product_id" class="form-label">Product:</label>
+                        <select name="product_id" class="form-select" required>
+                            <?php foreach($inventory as $product): ?>
+                            <option value="<?php echo htmlspecialchars($product['id']); ?>">
+                                <?php echo htmlspecialchars($product['name']); ?>
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="quantity" class="form-label">Quantity:</label>
+                        <input type="number" name="quantity" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Process Order</button>
+                </form>
+            </div>
+        </div>
 
-    <h2>Order Log</h2>
-    <?php
-    $ordersFile = __DIR__ . '/../data/orders.json';
-    if (file_exists($ordersFile)) {
-        $ordersData = file_get_contents($ordersFile);
-        $orders = json_decode($ordersData, true);
-        if ($orders && count($orders) > 0) {
-            echo '<ul>';
-            foreach ($orders as $order) {
-                echo '<li>Product ID: ' . htmlspecialchars($order['product_id']) . ', Quantity: ' . htmlspecialchars($order['quantity']) . ', Time: ' . date('Y-m-d H:i:s', $order['timestamp']) . '</li>';
+        <div class="card mb-4">
+            <div class="card-header">Low Stock Notifications</div>
+            <div class="card-body">
+                <?php if (isset($_SESSION['notifications']) && count($_SESSION['notifications']) > 0): ?>
+                <?php foreach ($_SESSION['notifications'] as $note): ?>
+                <div class="alert alert-warning notification"><?php echo htmlspecialchars($note); ?></div>
+                <?php endforeach; ?>
+                <?php else: ?>
+                <p>No notifications.</p>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">Order Log</div>
+            <div class="card-body">
+                <?php
+            $ordersFile = __DIR__ . '/../data/orders.json';
+            if (file_exists($ordersFile)) {
+                $ordersData = file_get_contents($ordersFile);
+                $orders = json_decode($ordersData, true);
+                if ($orders && count($orders) > 0) {
+                    echo '<ul class="list-group">';
+                    foreach ($orders as $order) {
+                        echo '<li class="list-group-item">';
+                        echo 'Product ID: ' . htmlspecialchars($order['product_id']) . ', Quantity: ' . htmlspecialchars($order['quantity']) . ', Time: ' . date('Y-m-d H:i:s', $order['timestamp']);
+                        echo '</li>';
+                    }
+                    echo '</ul>';
+                } else {
+                    echo '<p>No orders logged.</p>';
+                }
+            } else {
+                echo '<p>Order log file not found.</p>';
             }
-            echo '</ul>';
-        } else {
-            echo '<p>No orders logged.</p>';
+            ?>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    // Wait for the DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Select the alert element
+        var alert = document.getElementById('alert-message');
+        // Check if the alert exists
+        if (alert) {
+            // Set a timeout to remove the alert after 10 seconds
+            setTimeout(function() {
+                // Fade out the alert before removing
+                alert.classList.add('fade');
+                alert.classList.remove('show');
+                // Wait for the fade transition to complete (150ms for Bootstrap's default)
+                setTimeout(function() {
+                    alert.remove();
+                }, 150);
+            }, 10000); // 10000 milliseconds = 10 seconds
         }
-    } else {
-        echo '<p>Order log file not found.</p>';
-    }
-    ?>
+    });
+    </script>
 </body>
 
 </html>

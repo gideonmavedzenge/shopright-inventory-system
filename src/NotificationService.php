@@ -3,8 +3,9 @@ namespace ShopRight;
 
 class NotificationService {
     public function __construct() {
-        if (session_status() === PHP_SESSION_NONE) {
+        if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
             session_start();
+            $_SESSION = [];
         }
         if (!isset($_SESSION['notifications'])) {
             $_SESSION['notifications'] = [];

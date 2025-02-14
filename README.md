@@ -13,10 +13,11 @@ This project is a simplified PHP 8 Inventory Management Microservice for the Sho
 -   **Cache Service:** Uses PHP sessions to cache inventory data.
 -   **Error Logging:** Logs errors in file operations to a separate log file.
 -   **Composer Autoloading:** Utilizes Composer's PSR-4 autoloading for modular code organization.
+-   **Automated tests:** Some php unit tests to make sure functions are working as expected.
 
 ## Project Structure
 
-shopright-inventory-system/ ├── composer.json ├── public/ │ └── index.php ├── src/ │ ├── CacheService.php │ ├── InventoryManager.php │ ├── LogService.php │ ├── NotificationService.php │ └── OrderProcessor.php ├── data/ │ ├── products.json │ ├── orders.json │ └── logs.json └── README.md
+shopright-inventory-system/ ├── composer.json ├── phpunit.xml ├── phpunit.bootstrap.php ├── public/ │ └── index.php ├── src/ │ ├── CacheService.php │ ├── InventoryManager.php │ ├── LogService.php │ ├── NotificationService.php │ └── OrderProcessor.php ├── data/ │ ├── products.json │ ├── orders.json │ └── logs.json ├── tests/ │ └── OrderProcessorTest.php └── README.md
 
 ## Setup Instructions
 
@@ -27,6 +28,7 @@ shopright-inventory-system/ ├── composer.json ├── public/ │ └─
    `cd shopright-inventory-system`
 
 3. **Install Composer Dependencies:**
+   `composer install`
    `composer dump-autoload`
 
 4. **Ensure PHP 8 is Installed:**
@@ -38,6 +40,9 @@ shopright-inventory-system/ ├── composer.json ├── public/ │ └─
 
 6. **Access the Application:**
    Open your browser and go to [http://localhost:8000/index.php](http://localhost:8000/index.php)
+
+7. **Running the tests**
+   `vendor/bin/phpunit`
 
 ## Design Decisions
 
