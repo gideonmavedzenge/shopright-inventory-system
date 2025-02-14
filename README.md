@@ -21,7 +21,7 @@ shopright-inventory-system/ ├── composer.json ├── public/ │ └─
 ## Setup Instructions
 
 1. **Clone the Repository:**
-   git clone https://github.com/yourusername/shopright-inventory-system.git
+   git clone https://github.com/gideonmavedzenge/shopright-inventory-system.git
 
 2. **Navigate to the Project Directory:**
    `cd shopright-inventory-system`
